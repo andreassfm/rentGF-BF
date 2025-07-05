@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "681589745879",
+    "project_id": "sewapacar-707ca",
+    "storage_bucket": "sewapacar-707ca.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:681589745879:android:181c47f3a0ffb5d5bde892",
+        "android_client_info": {
+          "package_name": "com.example.latihan"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC_us0mtyRAGKOThySTFmM1cLZezWq9B9U"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

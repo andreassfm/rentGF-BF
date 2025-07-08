@@ -5,21 +5,41 @@ import 'package:latihan/tugas/views/real_life.dart';
 import 'package:latihan/tugas/views/virtual.dart';
 import 'package:provider/provider.dart';
 
-class Partner extends StatelessWidget {
+class Partner extends StatefulWidget {
   final String kategori;
   const Partner({super.key, required this.kategori});
 
   @override
+  State<Partner> createState() => _PartnerState();
+}
+
+class _PartnerState extends State<Partner> {
+  @override
+  void initState() {
+    super.initState();
+    Future.microtask(() {
+      context.read<PartnerProvider>().getDataPartner();
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     final partnerProvider = context.watch<PartnerProvider>();
+    if (partnerProvider.isLoading) {
+      return Scaffold(
+        appBar: AppBar(title: Text('Pilihan Partner ${widget.kategori}')),
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+
     final listPartner =
         partnerProvider.partnerList
-            .where((p) => p.kategori == kategori)
+            .where((p) => p.kategori == widget.kategori)
             .toList();
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Pilihan Partner ${kategori}'),
+        title: Text('Pilihan Partner ${widget.kategori}'),
         centerTitle: true,
       ),
       body: ListView.builder(
@@ -43,7 +63,7 @@ class Partner extends StatelessWidget {
               partnerProvider.selectedPartner == null
                   ? null
                   : () {
-                    if (kategori.toLowerCase() == 'virtual') {
+                    if (widget.kategori.toLowerCase() == 'virtual') {
                       Navigator.push(
                         context,
                         MaterialPageRoute(

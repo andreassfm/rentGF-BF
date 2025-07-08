@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:latihan/tugas/providers/auth_service.dart';
-import 'package:latihan/tugas/providers/userProvider.dart';
 import 'package:latihan/tugas/views/pilihan.dart';
 import 'package:latihan/tugas/views/register_form.dart';
-import 'package:provider/provider.dart';
 
 class LoginForm extends StatefulWidget {
   const LoginForm({super.key});

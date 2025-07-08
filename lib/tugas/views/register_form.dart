@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:latihan/tugas/providers/userProvider.dart';
-import 'package:latihan/tugas/models/userModel.dart';
+import 'package:latihan/tugas/providers/auth_service.dart';
 import 'package:latihan/tugas/views/login_form.dart';
 import 'package:provider/provider.dart';
 
@@ -12,10 +11,10 @@ class RegisterForm extends StatefulWidget {
 }
 
 class _RegisterFormState extends State<RegisterForm> {
-    final usernameController = TextEditingController();
-    final emailController = TextEditingController();
-    final passwordController = TextEditingController();
-    bool _obscurePassword = true;
+  final usernameController = TextEditingController();
+  final emailController = TextEditingController();
+  final passwordController = TextEditingController();
+  bool _obscurePassword = true;
 
   @override
   Widget build(BuildContext context) {
@@ -75,25 +74,41 @@ class _RegisterFormState extends State<RegisterForm> {
                   width: double.infinity,
                   child: ElevatedButton(
                     onPressed: () async {
-                      if (usernameController.text.isEmpty ||
-                          emailController.text.isEmpty ||
-                          passwordController.text.isEmpty) {
+                      final username = usernameController.text.trim();
+                      final email = emailController.text.trim();
+                      final password = passwordController.text.trim();
+
+                      if (username.isEmpty ||
+                          email.isEmpty ||
+                          password.isEmpty) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(content: Text('Harap isi semua field')),
                         );
                         return;
                       }
-                      final newUser = UserModel(
-                        username: usernameController.text,
-                        email: emailController.text,
-                        password: passwordController.text,
-                      );
-                      await context.read<UserProvider>().register(newUser);
 
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(builder: (context) => LoginForm()),
+                      final auth = AuthService();
+                      final result = await auth.register(
+                        username: username,
+                        email: email,
+                        password: password,
                       );
+
+                      if (result == null) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('Register berhasil, silahkan login'),
+                          ),
+                        );
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(builder: (context) => LoginForm()),
+                        );
+                      } else {
+                        ScaffoldMessenger.of(
+                          context,
+                        ).showSnackBar(SnackBar(content: Text(result)));
+                      }
                     },
                     style: ElevatedButton.styleFrom(
                       padding: EdgeInsets.symmetric(vertical: 16),

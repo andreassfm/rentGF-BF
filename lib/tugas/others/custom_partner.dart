@@ -29,11 +29,11 @@ class CustomPartner extends StatelessWidget {
         ),
         child: ListTile(
           leading: CircleAvatar(
-            backgroundImage: AssetImage(partner.fotoPartner),
+            backgroundImage: NetworkImage(partner.fotoPartner!),
             radius: 30,
           ),
-          title: Text(partner.namaPartner),
-          subtitle: Text(partner.bioPartner),
+          title: Text(partner.namaPartner ?? ''),
+          subtitle: Text(partner.bioPartner ?? ''),
           trailing:
               isSelected
                   ? Icon(Icons.check_circle, color: Colors.deepPurple)

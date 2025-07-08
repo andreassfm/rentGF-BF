@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:latihan/tugas/models/orderModel.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -6,6 +7,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 class OrderProvider extends ChangeNotifier {
   List<OrderModel> _orderList = [];
   List<OrderModel> get orderList => _orderList;
+
+  bool isLoading = true;
+  String? errorMessage;
 
   void addOrder(OrderModel order) async {
     _orderList.add(order);
@@ -71,6 +75,44 @@ class OrderProvider extends ChangeNotifier {
       _orderList[index] = updateOrder;
       saveToLocal();
       notifyListeners();
+    }
+  }
+
+  Future<void> getDataOrders() async {
+    isLoading = true;
+    errorMessage = null;
+    notifyListeners();
+
+    try {
+      final response = await Dio().get(
+        'https://686a35f22af1d945cea37ab1.mockapi.io/api/v1/orders',
+      );
+      if (response.statusCode == 200) {
+        final data = response.data as List;
+        _orderList = data.map((e) => OrderModel.fromMap(e)).toList();
+      } else {
+        errorMessage = 'Gagal memuat data: ${response.statusCode}';
+      }
+    } catch (e) {
+      errorMessage = 'Terjadi kesalahan: $e';
+    } finally {
+      isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<void> addOrderOnline(OrderModel order) async {
+    try {
+      final res = await Dio().post(
+        'https://686a35f22af1d945cea37ab1.mockapi.io/api/v1/orders',
+        data: order.toMap(),
+      );
+      if (res.statusCode == 201 || res.statusCode == 200) {
+        _orderList.add(order);
+        notifyListeners();
+      } else {}
+    } catch (e) {
+      print('Gagal menambahkan data ke API: $e');
     }
   }
 }

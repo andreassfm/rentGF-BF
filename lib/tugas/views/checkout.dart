@@ -5,6 +5,7 @@ import 'package:latihan/tugas/models/orderModel.dart';
 import 'package:latihan/tugas/models/partnerModel.dart';
 import 'package:latihan/tugas/views/kelolaPesanan.dart';
 import 'package:provider/provider.dart';
+import 'package:latihan/tugas/providers/firestore_service.dart';
 
 class Checkout extends StatefulWidget {
   final String namaPaket;
@@ -47,7 +48,7 @@ class _CheckoutState extends State<Checkout> {
             Row(
               children: [
                 CircleAvatar(
-                  backgroundImage: AssetImage(widget.partner.fotoPartner),
+                  backgroundImage: NetworkImage(widget.partner.fotoPartner!),
                   radius: 30,
                 ),
                 SizedBox(width: 12),
@@ -60,7 +61,7 @@ class _CheckoutState extends State<Checkout> {
                         style: TextStyle(fontSize: 20),
                       ),
                       Text(
-                        widget.partner.bioPartner,
+                        widget.partner.bioPartner!,
                         style: TextStyle(color: Colors.grey[700]),
                       ),
                     ],
@@ -97,20 +98,23 @@ class _CheckoutState extends State<Checkout> {
               onPressed:
                   metodeTerpilih == null
                       ? null
-                      : () {
+                      : () async {
                         final order = OrderModel(
                           idOrder: DateTime.now().millisecondsSinceEpoch,
-                          idPartner: widget.partner.idPartner,
+                          idPartner: widget.partner.idPartner!,
                           username: userController.user!.username,
-                          namaPartner: widget.partner.namaPartner,
+                          namaPartner: widget.partner.namaPartner ?? '',
                           namaPaket: widget.namaPaket,
                           hargaPaket: widget.hargaPaket,
-                          kategori: widget.partner.kategori,
+                          kategori:
+                              kategoriValues.reverse[widget.partner.kategori] ??
+                              '',
                           tanggalOrder: DateTime.now(),
                           isConfirmed: true,
                           metodePembayaran: metodeTerpilih!,
                         );
                         orderController.addOrder(order);
+                        await FirestoreService().simpanPesananDatabase(order);
                         final checkoutContext = context;
                         showDialog(
                           context: checkoutContext,

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:latihan/tugas/providers/auth_service.dart';
 import 'package:latihan/tugas/providers/userProvider.dart';
 import 'package:latihan/tugas/views/pilihan.dart';
 import 'package:latihan/tugas/views/register_form.dart';
@@ -12,9 +13,10 @@ class LoginForm extends StatefulWidget {
 }
 
 class _LoginFormState extends State<LoginForm> {
-    final emailController = TextEditingController();
-    final passwordController = TextEditingController();
-    bool _obscurePassword = true;
+  final emailController = TextEditingController();
+  final passwordController = TextEditingController();
+  bool _obscurePassword = true;
+  bool _isLoading = false;
 
   @override
   Widget build(BuildContext context) {
@@ -74,35 +76,61 @@ class _LoginFormState extends State<LoginForm> {
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
-                    onPressed: () async {
-                      final success = await context
-                          .read<UserProvider>()
-                          .login(
-                            emailController.text,
-                            passwordController.text,
-                          );
-                      if (success) {
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => HalamanPilhan(),
-                          ),
-                        );
-                      } else {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text('Username atau Password salah'),
-                          ),
-                        );
-                      }
-                    },
+                    onPressed:
+                        _isLoading
+                            ? null
+                            : () async {
+                              final email = emailController.text.trim();
+                              final password = passwordController.text.trim();
+
+                              if (email.isEmpty || password.isEmpty) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text('Harap isi semua field.'),
+                                  ),
+                                );
+                                return;
+                              }
+                              setState(() => _isLoading = true);
+
+                              final auth = AuthService();
+                              final result = await auth.login(
+                                email: email,
+                                password: password,
+                              );
+
+                              setState(() => _isLoading = false);
+
+                              if (result == null) {
+                                final username = await auth.getUsername();
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text('Selamat Datang $username'),
+                                  ),
+                                );
+
+                                Navigator.pushReplacement(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => HalamanPilhan(),
+                                  ),
+                                );
+                              } else {
+                                ScaffoldMessenger.of(
+                                  context,
+                                ).showSnackBar(SnackBar(content: Text(result)));
+                              }
+                            },
                     style: ElevatedButton.styleFrom(
                       padding: EdgeInsets.symmetric(vertical: 16),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
                     ),
-                    child: const Text('Login'),
+                    child:
+                        _isLoading
+                            ? CircularProgressIndicator(color: Colors.white)
+                            : Text('Login'),
                   ),
                 ),
                 SizedBox(height: 5),

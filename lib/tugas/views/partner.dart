@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:latihan/tugas/models/partnerModel.dart';
 import 'package:latihan/tugas/providers/partnerProvider.dart';
 import 'package:latihan/tugas/others/custom_partner.dart';
 import 'package:latihan/tugas/views/real_life.dart';
@@ -18,7 +19,7 @@ class _PartnerState extends State<Partner> {
   void initState() {
     super.initState();
     Future.microtask(() {
-      context.read<PartnerProvider>().getDataPartner();
+      Provider.of<PartnerProvider>(context, listen: false).getDataPartner();
     });
   }
 
@@ -32,9 +33,10 @@ class _PartnerState extends State<Partner> {
       );
     }
 
+    final selectKategori = kategoriValues.map[widget.kategori];
     final listPartner =
         partnerProvider.partnerList
-            .where((p) => p.kategori == widget.kategori)
+            .where((p) => p.kategori == selectKategori)
             .toList();
 
     return Scaffold(

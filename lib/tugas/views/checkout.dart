@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:latihan/tugas/providers/auth_service.dart';
 import 'package:latihan/tugas/providers/orderProvider.dart';
 import 'package:latihan/tugas/providers/userProvider.dart';
 import 'package:latihan/tugas/models/orderModel.dart';
@@ -102,7 +103,7 @@ class _CheckoutState extends State<Checkout> {
                         final order = OrderModel(
                           idOrder: DateTime.now().millisecondsSinceEpoch,
                           idPartner: widget.partner.idPartner!,
-                          username: userController.user!.username,
+                          username: await AuthService().getUsername() ?? '',
                           namaPartner: widget.partner.namaPartner ?? '',
                           namaPaket: widget.namaPaket,
                           hargaPaket: widget.hargaPaket,
